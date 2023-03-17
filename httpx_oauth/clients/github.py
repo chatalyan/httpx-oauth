@@ -47,7 +47,9 @@ class GitHubOAuth2(BaseOAuth2[GitHubOAuth2AuthorizeParams]):
             base_scopes=scopes,
         )
 
-    async def get_id_email(self, token: str) -> Tuple[str, Optional[str, Dict]]:
+    async def get_id_email(
+        self, token: str
+    ) -> Tuple[str, Optional[str], Dict[str, Any]]:
         async with httpx.AsyncClient(
             headers={**self.request_headers, "Authorization": f"token {token}"}
         ) as client:

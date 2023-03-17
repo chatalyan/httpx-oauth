@@ -8,11 +8,13 @@ from typing import (
     Optional,
     Tuple,
     TypeVar,
+    Union,
     cast,
 )
 from urllib.parse import urlencode
 
 import httpx
+from starlette.datastructures import URL
 
 from httpx_oauth.errors import HTTPXOAuthError
 
@@ -91,7 +93,7 @@ class BaseOAuth2(Generic[T]):
         self.revoke_token_endpoint = revoke_token_endpoint
         self.name = name
         self.base_scopes = base_scopes
-        self.base_fields = base_fields
+        self.base_fields = base_fields or []
 
         self.request_headers = {
             "Accept": "application/json",
@@ -124,7 +126,10 @@ class BaseOAuth2(Generic[T]):
         return f"{self.authorize_endpoint}?{urlencode(params)}"
 
     async def get_access_token(
-        self, code: str, redirect_uri: str, code_verifier: Optional[str] = None
+        self,
+        code: str,
+        redirect_uri: Optional[str] = None,
+        code_verifier: Optional[str] = None,
     ):
         async with self.get_httpx_client() as client:
             data = {
@@ -191,7 +196,9 @@ class BaseOAuth2(Generic[T]):
             if response.status_code >= 400:
                 raise RevokeTokenError(response.json())
 
-    async def get_id_email(self, token: str) -> Tuple[str, Optional[str, Dict]]:
+    async def get_id_email(
+        self, token: str
+    ) -> Tuple[str, Optional[str], Dict[str, Any]]:
         raise NotImplementedError()
 
     def get_httpx_client(self) -> AsyncContextManager[httpx.AsyncClient]:

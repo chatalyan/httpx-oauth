@@ -61,7 +61,9 @@ class GoogleOAuth2(BaseOAuth2[GoogleOAuth2AuthorizeParams]):
             base_fields=fields,
         )
 
-    async def get_id_email(self, token: str) -> Tuple[str, Optional[str, Dict]]:
+    async def get_id_email(
+        self, token: str
+    ) -> Tuple[str, Optional[str], Dict[str, Any]]:
         async with self.get_httpx_client() as client:
             fields = "emailAddresses"
             for base_field in self.base_fields:
@@ -111,7 +113,10 @@ class GoogleOAuth2(BaseOAuth2[GoogleOAuth2AuthorizeParams]):
                 extra_data.update(
                     {
                         "picture": next(
-                            {"url": photo["url"], "default": photo.get("default", False)}
+                            {
+                                "url": photo["url"],
+                                "default": photo.get("default", False),
+                            }
                             for photo in data["photos"]
                             if photo["metadata"]["primary"]
                         ),

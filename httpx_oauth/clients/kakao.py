@@ -41,7 +41,9 @@ class KakaoOAuth2(BaseOAuth2[Dict[str, Any]]):
             base_scopes=scopes,
         )
 
-    async def get_id_email(self, token: str) -> Tuple[str, Optional[str]]:
+    async def get_id_email(
+        self, token: str
+    ) -> Tuple[str, Optional[str], Dict[str, Any]]:
         async with self.get_httpx_client() as client:
             response = await client.post(
                 PROFILE_ENDPOINT,
@@ -55,4 +57,4 @@ class KakaoOAuth2(BaseOAuth2[Dict[str, Any]]):
             payload = cast(Dict[str, Any], response.json())
             account_id = str(payload["id"])
             email = payload["kakao_account"].get("email")
-            return account_id, email
+            return account_id, email, {}

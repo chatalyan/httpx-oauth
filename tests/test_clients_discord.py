@@ -68,7 +68,7 @@ class TestDiscordGetIdEmail:
             return_value=Response(200, json=profile_verified_email_response)
         )
 
-        user_id, user_email = await client.get_id_email("TOKEN")
+        user_id, user_email, extra_data = await client.get_id_email("TOKEN")
         _, headers, _ = await get_respx_call_args(request)
 
         assert headers["Authorization"] == "Bearer TOKEN"
@@ -96,7 +96,7 @@ class TestDiscordGetIdEmail:
             return_value=Response(200, json=profile_no_email_response)
         )
 
-        user_id, user_email = await client.get_id_email("TOKEN")
+        user_id, user_email, extra_data = await client.get_id_email("TOKEN")
 
         assert user_id == "80351110224678912"
         assert user_email is None
@@ -108,7 +108,7 @@ class TestDiscordGetIdEmail:
             return_value=Response(200, json=profile_not_verified_email_response)
         )
 
-        user_id, user_email = await client.get_id_email("TOKEN")
+        user_id, user_email, extra_data = await client.get_id_email("TOKEN")
 
         assert user_id == "80351110224678912"
         assert user_email is None

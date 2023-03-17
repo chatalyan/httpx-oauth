@@ -41,7 +41,9 @@ class DiscordOAuth2(BaseOAuth2[Dict[str, Any]]):
             base_scopes=scopes,
         )
 
-    async def get_id_email(self, token: str) -> Tuple[str, Optional[str]]:
+    async def get_id_email(
+        self, token: str
+    ) -> Tuple[str, Optional[str], Dict[str, Any]]:
         async with self.get_httpx_client() as client:
             response = await client.get(
                 PROFILE_ENDPOINT,
@@ -59,4 +61,4 @@ class DiscordOAuth2(BaseOAuth2[Dict[str, Any]]):
             if not data.get("verified", False):
                 user_email = None
 
-            return user_id, user_email
+            return user_id, user_email, {}

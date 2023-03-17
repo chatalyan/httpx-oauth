@@ -118,12 +118,13 @@ class TestFacebookGetIdEmail:
             return_value=Response(200, json=profile_response_no_email)
         )
 
-        user_id, user_email = await client.get_id_email("TOKEN")
+        user_id, user_email, extra_data = await client.get_id_email("TOKEN")
         url, headers, content = await get_respx_call_args(request)
 
         assert "access_token=TOKEN" in url.query.decode("utf-8")
         assert user_id == "424242"
         assert user_email is None
+        assert extra_data == {}
 
     @pytest.mark.asyncio
     @respx.mock

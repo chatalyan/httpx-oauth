@@ -1,6 +1,7 @@
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 import httpx
+from starlette.datastructures import URL
 
 import httpx_oauth.oauth2 as oauth
 from httpx_oauth.errors import GetIdEmailError
@@ -54,7 +55,10 @@ class RedditOAuth2(oauth.BaseOAuth2[Dict[str, Any]]):
         self.revoke_token_endpoint: str
 
     async def get_access_token(
-        self, code: str, redirect_uri: str, code_verifier: Optional[str] = None
+        self,
+        code: str,
+        redirect_uri: Optional[str] = None,
+        code_verifier: Optional[str] = None,
     ) -> oauth.OAuth2Token:
         async with self.get_httpx_client() as client:
             response = await client.post(
@@ -115,7 +119,9 @@ class RedditOAuth2(oauth.BaseOAuth2[Dict[str, Any]]):
             if response.status_code >= httpx.codes.BAD_REQUEST:
                 raise oauth.RevokeTokenError()
 
-    async def get_id_email(self, token: str) -> Tuple[str, Optional[str]]:
+    async def get_id_email(
+        self, token: str
+    ) -> Tuple[str, Optional[str], Dict[str, Any]]:
         async with self.get_httpx_client() as client:
             headers = self.request_headers.copy()
             headers["Authorization"] = f"Bearer {token}"
@@ -131,4 +137,4 @@ class RedditOAuth2(oauth.BaseOAuth2[Dict[str, Any]]):
                 raise GetIdEmailError({"error": response.status_code})
 
             data = cast(Dict[str, Any], response.json())
-            return data["name"], None
+            return data["name"], None, {}

@@ -86,7 +86,7 @@ class TestOpenIdGetIdEmail:
             return_value=Response(200, json=userinfo_response)
         )
 
-        user_id, user_email = await client.get_id_email("TOKEN")
+        user_id, user_email, extra_data = await client.get_id_email("TOKEN")
         url, headers, content = await get_respx_call_args(request)
 
         assert headers["Authorization"] == "Bearer TOKEN"

@@ -1,7 +1,8 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from fastapi import HTTPException
 from starlette import status
+from starlette.datastructures import URL
 from starlette.requests import Request
 
 from httpx_oauth.oauth2 import BaseOAuth2, OAuth2Token
@@ -38,11 +39,10 @@ class OAuth2AuthorizeCallback:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=error if error is not None else None,
             )
+        redirect_url = self.redirect_url
 
         if self.route_name:
-            redirect_url = request.url_for(self.route_name)
-        elif self.redirect_url:
-            redirect_url = self.redirect_url
+            redirect_url = str(request.url_for(self.route_name))
 
         access_token = await self.client.get_access_token(
             code, redirect_url, code_verifier

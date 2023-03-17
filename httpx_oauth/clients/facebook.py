@@ -72,7 +72,9 @@ class FacebookOAuth2(BaseOAuth2[Dict[str, Any]]):
 
             return OAuth2Token(data)
 
-    async def get_id_email(self, token: str) -> Tuple[str, Optional[str, Dict]]:
+    async def get_id_email(
+        self, token: str
+    ) -> Tuple[str, Optional[str], Dict[str, Any]]:
         async with self.get_httpx_client() as client:
             fields = "id,email"
 
@@ -92,16 +94,21 @@ class FacebookOAuth2(BaseOAuth2[Dict[str, Any]]):
                 raise GetIdEmailError(response.json())
 
             data = cast(Dict[str, Any], response.json())
+            print(data)
 
             extra_data = {}
 
-            if "first_name" in fields:
+            if "first_name" in fields and data.get("first_name"):
                 extra_data.update({"first_name": data["first_name"]})
 
-            if "last_name" in fields:
+            if "last_name" in fields and data.get("last_name"):
                 extra_data.update({"last_name": data["last_name"]})
 
-            if "picture" in fields:
+            if (
+                "picture" in fields
+                and data.get("picture", {}).get("data", {}).get("url")
+                and data.get("picture", {}).get("data", {}).get("is_silhouette")
+            ):
                 extra_data.update(
                     {
                         "picture": {

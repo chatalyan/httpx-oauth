@@ -94,7 +94,7 @@ Raises a `GetIdEmailError` if an error occurs.
 
 !!! example
     ```py
-    user_id, user_email = await client.get_id_email("TOKEN")
+    user_id, user_email, extra_data = await client.get_id_email("TOKEN")
     ```
 
 ### `OAuth2Token` class

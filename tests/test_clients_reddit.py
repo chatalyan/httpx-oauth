@@ -239,7 +239,7 @@ class TestRedditGetIdEmail:
             )
         )
 
-        user_id, user_email = await client.get_id_email(FAKE_ACCESS_TOKEN)
+        user_id, user_email, extra_data = await client.get_id_email(FAKE_ACCESS_TOKEN)
         url, headers, content = await get_respx_call_args(request)
 
         assert headers["Authorization"] == f"Bearer {FAKE_ACCESS_TOKEN}"

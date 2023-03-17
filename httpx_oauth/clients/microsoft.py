@@ -52,7 +52,9 @@ class MicrosoftGraphOAuth2(BaseOAuth2[Dict[str, Any]]):
             redirect_uri, state=state, scope=scope, extras_params=extras_params
         )
 
-    async def get_id_email(self, token: str) -> Tuple[str, Optional[str, Dict]]:
+    async def get_id_email(
+        self, token: str
+    ) -> Tuple[str, Optional[str], Dict[str, Any]]:
         async with self.get_httpx_client() as client:
             response = await client.get(
                 PROFILE_ENDPOINT,

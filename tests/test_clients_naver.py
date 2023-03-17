@@ -46,7 +46,7 @@ class TestNaverdGetIdEmail:
             return_value=Response(200, json=profile_response)
         )
 
-        user_id, user_email = await client.get_id_email("TOKEN")
+        user_id, user_email, extra_data = await client.get_id_email("TOKEN")
         _, headers, _ = await get_respx_call_args(request)
 
         assert headers["Authorization"] == "Bearer TOKEN"
@@ -74,7 +74,7 @@ class TestNaverdGetIdEmail:
             return_value=Response(200, json=profile_no_email_response)
         )
 
-        user_id, user_email = await client.get_id_email("TOKEN")
+        user_id, user_email, extra_data = await client.get_id_email("TOKEN")
 
         assert user_id == "424242424242424242424242"
         assert user_email is None

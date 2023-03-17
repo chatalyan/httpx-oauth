@@ -69,7 +69,9 @@ class NaverOAuth2(BaseOAuth2[Dict[str, Any]]):
             if response.status_code >= 400:
                 raise oauth.RevokeTokenError()
 
-    async def get_id_email(self, token: str) -> Tuple[str, Optional[str]]:
+    async def get_id_email(
+        self, token: str
+    ) -> Tuple[str, Optional[str], Dict[str, Any]]:
         async with self.get_httpx_client() as client:
             response = await client.post(
                 PROFILE_ENDPOINT,
@@ -81,4 +83,4 @@ class NaverOAuth2(BaseOAuth2[Dict[str, Any]]):
 
             json = cast(Dict[str, Any], response.json())
             account_info: Dict[str, Any] = json["response"]
-            return account_info["id"], account_info.get("email")
+            return account_info["id"], account_info.get("email"), {}

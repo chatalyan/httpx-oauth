@@ -43,7 +43,9 @@ class OpenID(BaseOAuth2[Dict[str, Any]]):
             base_scopes,
         )
 
-    async def get_id_email(self, token: str) -> Tuple[str, Optional[str]]:
+    async def get_id_email(
+        self, token: str
+    ) -> Tuple[str, Optional[str], Dict[str, Any]]:
         async with self.get_httpx_client() as client:
             response = await client.get(
                 self.openid_configuration["userinfo_endpoint"],
@@ -55,4 +57,4 @@ class OpenID(BaseOAuth2[Dict[str, Any]]):
 
             data: Dict[str, Any] = response.json()
 
-            return str(data["sub"]), data.get("email")
+            return str(data["sub"]), data.get("email"), {}
