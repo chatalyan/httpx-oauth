@@ -4,14 +4,13 @@ import pytest
 import respx
 from httpx import Response
 
-from httpx_oauth.clients.microsoft import MicrosoftGraphOAuth2, PROFILE_ENDPOINT
+from httpx_oauth.clients.microsoft import PROFILE_ENDPOINT, MicrosoftGraphOAuth2
 from httpx_oauth.errors import GetIdEmailError
 
 client = MicrosoftGraphOAuth2("CLIENT_ID", "CLIENT_SECRET")
 
 
 def test_microsoft_graph_oauth2_default_tenant():
-
     assert (
         client.authorize_endpoint
         == "https://login.microsoftonline.com/common/oauth2/v2.0/authorize"

@@ -46,7 +46,8 @@ Raises a `GetAccessTokenError` if an error occurs.
 
 !!! abstract "Parameters"
     * `code: str`: The authorization code passed in the redirection callback.
-    * `redirect_uri: str `: The exact same `redirect_uri` you passed to the authorization URL.
+    * `redirect_uri: str`: The exact same `redirect_uri` you passed to the authorization URL.
+    * `code_verifier: Optional[str]`: Optional code verifier in a [PKCE context](https://datatracker.ietf.org/doc/html/rfc7636).
 
 !!! example
     ```py
@@ -84,12 +85,12 @@ Raises a `RevokeTokenNotSupportedError` if no `revoke_token_endpoint` was provid
 
 #### `get_id_email`
 
-Returns the id and the email of the authenticated user from the API provider. **It assumes you have asked for the required scopes**.
+Returns the id and the email (if available) of the authenticated user from the API provider. **It assumes you have asked for the required scopes**.
 
 Raises a `GetIdEmailError` if an error occurs.
 
 !!! abstract "Parameters"
-    * `token: str`: A token or refresh token to revoke.
+    * `token: str`: A valid access token.
 
 !!! example
     ```py
@@ -121,6 +122,33 @@ A utility method is provided to quickly determine if the token is still valid or
 ## Provided clients
 
 We provide several ready-to-use clients for widely used services with configured endpoints and specificites took into account.
+
+### OpenID
+
+Generic client for providers following the [OpenID Connect protocol](https://openid.net/connect/). Besides the Client ID and the Client Secret, you'll have to provide the OpenID configuration endpoint, allowing the client to discover the required endpoints automatically. By convention, it's usually served under the path `.well-known/openid-configuration`.
+
+```py
+from httpx_oauth.clients.openid import OpenID
+
+client = OpenID("CLIENT_ID", "CLIENT_SECRET", "https://example.fief.dev/.well-known/openid-configuration")
+```
+
+* ❓ `refresh_token`: depends if the OpenID provider supports it
+* ❓ `revoke_token`: depends if the OpenID provider supports it
+
+### Discord
+
+```py
+from httpx_oauth.clients.discord import DiscordOAuth2
+
+client = DiscordOAuth2("CLIENT_ID", "CLIENT_SECRET")
+```
+
+* ✅ `refresh_token`
+* ✅ `revoke_token`
+
+!!! warning "Warning about `get_id_email`"
+    Email is optional for Discord accounts, so the email might be `None`.
 
 ### Facebook
 
@@ -172,6 +200,17 @@ client = GoogleOAuth2("CLIENT_ID", "CLIENT_SECRET")
 * ✅ `refresh_token`
 * ✅ `revoke_token`
 
+### Kakao
+
+```py
+from httpx_oauth.clients.kakao import KakaoOAuth2
+
+client = KakaoOAuth2("CLIENT_ID", "CLIENT_SECRET")
+```
+
+* ✅ `refresh_token`
+* ✅ `revoke_token`
+
 ### LinkedIn
 
 ```py
@@ -182,3 +221,67 @@ client = LinkedInOAuth2("CLIENT_ID", "CLIENT_SECRET")
 
 * ✅ `refresh_token` (only for [selected partners](https://docs.microsoft.com/en-us/linkedin/shared/authentication/programmatic-refresh-tokens))
 * ❌ `revoke_token`
+
+### NAVER
+
+```py
+from httpx_oauth.clients.naver import NaverOAuth2
+
+client = NaverOAuth2("CLIENT_ID", "CLIENT_SECRET")
+```
+
+* ✅ `refresh_token`
+* ✅ `revoke_token`
+
+### Okta
+
+Based on the [OpenID client](#openid). You need to provide the domain of your Okta domain for automatically discovering the required endpoints.
+
+```py
+from httpx_oauth.clients.okta import OktaOAuth2
+
+client = OktaOAuth2("CLIENT_ID", "CLIENT_SECRET", "example.okta.com")
+```
+
+* ✅ `refresh_token`
+* ✅ `revoke_token`
+
+### Reddit
+
+```py
+from httpx_oauth.clients.reddit import RedditOAuth2
+
+client = RedditOAuth2("CLIENT_ID", "CLIENT_SECRET")
+```
+
+* ✅ `refresh_token`
+* ✅ `revoke_token`
+
+!!! warning "Warning about `get_id_email`"
+    Reddit API never return email addresses. Thus, e-mail will *always* be `None`.
+
+## Customize HTTPX client
+
+By default, requests are made using [`httpx.AsyncClient`](https://www.python-httpx.org/api/#asyncclient) with default parameters. If you wish to customize settings, like setting timeout or proxies, you can do this by overloading the `get_httpx_client` method.
+
+```py
+from typing import AsyncContextManager
+
+import httpx
+from httpx_oauth.oauth2 import OAuth2
+
+
+class OAuth2CustomTimeout(OAuth2):
+    def get_httpx_client(self) -> AsyncContextManager[httpx.AsyncClient]:
+        return httpx.AsyncClient(timeout=10.0)  # Use a default 10s timeout everywhere.
+
+
+client = OAuth2CustomTimeout(
+    "CLIENT_ID",
+    "CLIENT_SECRET",
+    "AUTHORIZE_ENDPOINT",
+    "ACCESS_TOKEN_ENDPOINT",
+    refresh_token_endpoint="REFRESH_TOKEN_ENDPOINT",
+    revoke_token_endpoint="REVOKE_TOKEN_ENDPOINT",
+)
+```

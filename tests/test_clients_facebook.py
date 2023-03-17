@@ -5,9 +5,9 @@ import respx
 from httpx import Response
 
 from httpx_oauth.clients.facebook import (
+    PROFILE_ENDPOINT,
     FacebookOAuth2,
     GetLongLivedAccessTokenError,
-    PROFILE_ENDPOINT,
 )
 from httpx_oauth.errors import GetIdEmailError
 from httpx_oauth.oauth2 import OAuth2Token
@@ -85,6 +85,7 @@ profile_response = {
         }
     },
 }
+profile_response_no_email = {"id": "424242"}
 
 
 class TestFacebookGetIdEmail:
@@ -109,6 +110,20 @@ class TestFacebookGetIdEmail:
                 "default": True,
             },
         }
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_success_no_email(self, get_respx_call_args):
+        request = respx.get(re.compile(f"^{PROFILE_ENDPOINT}")).mock(
+            return_value=Response(200, json=profile_response_no_email)
+        )
+
+        user_id, user_email = await client.get_id_email("TOKEN")
+        url, headers, content = await get_respx_call_args(request)
+
+        assert "access_token=TOKEN" in url.query.decode("utf-8")
+        assert user_id == "424242"
+        assert user_email is None
 
     @pytest.mark.asyncio
     @respx.mock

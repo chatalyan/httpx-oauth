@@ -1,5 +1,15 @@
 import time
-from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar, cast
+from typing import (
+    Any,
+    AsyncContextManager,
+    Dict,
+    Generic,
+    List,
+    Optional,
+    Tuple,
+    TypeVar,
+    cast,
+)
 from urllib.parse import urlencode
 
 import httpx
@@ -90,7 +100,7 @@ class BaseOAuth2(Generic[T]):
     async def get_authorization_url(
         self,
         redirect_uri: str,
-        state: str = None,
+        state: Optional[str] = None,
         scope: Optional[List[str]] = None,
         extras_params: Optional[T] = None,
     ) -> str:
@@ -114,9 +124,9 @@ class BaseOAuth2(Generic[T]):
         return f"{self.authorize_endpoint}?{urlencode(params)}"
 
     async def get_access_token(
-        self, code: str, redirect_uri: str, code_verifier: str = None
+        self, code: str, redirect_uri: str, code_verifier: Optional[str] = None
     ):
-        async with httpx.AsyncClient() as client:
+        async with self.get_httpx_client() as client:
             data = {
                 "grant_type": "authorization_code",
                 "code": code,
@@ -136,7 +146,7 @@ class BaseOAuth2(Generic[T]):
 
             data = cast(Dict[str, Any], response.json())
 
-            if response.status_code == 400:
+            if response.status_code >= 400:
                 raise GetAccessTokenError(data)
 
             return OAuth2Token(data)
@@ -145,7 +155,7 @@ class BaseOAuth2(Generic[T]):
         if self.refresh_token_endpoint is None:
             raise RefreshTokenNotSupportedError()
 
-        async with httpx.AsyncClient() as client:
+        async with self.get_httpx_client() as client:
             response = await client.post(
                 self.refresh_token_endpoint,
                 data={
@@ -159,16 +169,16 @@ class BaseOAuth2(Generic[T]):
 
             data = cast(Dict[str, Any], response.json())
 
-            if response.status_code == 400:
+            if response.status_code >= 400:
                 raise RefreshTokenError(data)
 
             return OAuth2Token(data)
 
-    async def revoke_token(self, token: str, token_type_hint: str = None):
+    async def revoke_token(self, token: str, token_type_hint: Optional[str] = None):
         if self.revoke_token_endpoint is None:
             raise RevokeTokenNotSupportedError()
 
-        async with httpx.AsyncClient() as client:
+        async with self.get_httpx_client() as client:
             data = {"token": token}
 
             if token_type_hint is not None:
@@ -178,11 +188,14 @@ class BaseOAuth2(Generic[T]):
                 self.revoke_token_endpoint, data=data, headers=self.request_headers
             )
 
-            if response.status_code == 400:
+            if response.status_code >= 400:
                 raise RevokeTokenError(response.json())
 
-    async def get_id_email(self, token: str) -> Tuple[str, str, Dict]:
+    async def get_id_email(self, token: str) -> Tuple[str, Optional[str, Dict]]:
         raise NotImplementedError()
+
+    def get_httpx_client(self) -> AsyncContextManager[httpx.AsyncClient]:
+        return httpx.AsyncClient()
 
 
 OAuth2 = BaseOAuth2[Dict[str, Any]]
