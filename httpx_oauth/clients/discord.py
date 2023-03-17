@@ -9,7 +9,6 @@ REVOKE_TOKEN_ENDPOINT = "https://discord.com/api/oauth2/token/revoke"
 BASE_SCOPES = ["identify", "email"]
 PROFILE_ENDPOINT = "https://discord.com/api/users/@me"
 
-
 LOGO_SVG = """
 <svg width="256px" height="199px" viewBox="0 0 256 199" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <g>

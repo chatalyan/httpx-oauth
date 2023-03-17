@@ -1,8 +1,7 @@
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 from fastapi import HTTPException
 from starlette import status
-from starlette.datastructures import URL
 from starlette.requests import Request
 
 from httpx_oauth.oauth2 import BaseOAuth2, OAuth2Token

@@ -1,7 +1,6 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 import httpx
-from starlette.datastructures import URL
 
 import httpx_oauth.oauth2 as oauth
 from httpx_oauth.errors import GetIdEmailError
@@ -13,7 +12,6 @@ REVOKE_ENDPOINT = "https://www.reddit.com/api/v1/revoke_token"
 IDENTITY_ENDPOINT = "https://oauth.reddit.com/api/v1/me"
 
 BASE_SCOPES = ["identity"]
-
 
 LOGO_SVG = """
 <svg width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">

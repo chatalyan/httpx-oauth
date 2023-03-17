@@ -8,13 +8,11 @@ from typing import (
     Optional,
     Tuple,
     TypeVar,
-    Union,
     cast,
 )
 from urllib.parse import urlencode
 
 import httpx
-from starlette.datastructures import URL
 
 from httpx_oauth.errors import HTTPXOAuthError
 

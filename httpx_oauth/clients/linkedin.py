@@ -9,7 +9,6 @@ BASE_SCOPES = ["r_emailaddress", "r_liteprofile", "r_basicprofile"]
 PROFILE_ENDPOINT = "https://api.linkedin.com/v2/me"
 EMAIL_ENDPOINT = "https://api.linkedin.com/v2/emailAddress"
 
-
 LOGO_SVG = """
 <svg width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
     <g>

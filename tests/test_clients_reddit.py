@@ -18,7 +18,6 @@ FAKE_REDIRECT_URI = "http://example.com/redirect/"
 FAKE_ACCESS_TOKEN = "12345678-fake-access-token-123456789012"
 FAKE_REFRESH_TOKEN = "12345678-fake-refresh-token-12345678901"
 
-
 client = reddit.RedditOAuth2(FAKE_CLIENT_ID, FAKE_CLIENT_SECRET)
 
 response_unauthorized = httpx.Response(
